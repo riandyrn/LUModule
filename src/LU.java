@@ -18,6 +18,7 @@ public class LU {
 	private ArrayList<String> ada_identifiers;
 	private ArrayList<String> list_jadwal_identifiers;
 	private ArrayList<String> place_identifiers;
+	private ArrayList<String> place_identifiers_relations;
 	
 	private final String TIME_MODIFIER = "time_modifier";
 	private final String PLACE_IDENTIFIER = "place_identifier";
@@ -55,13 +56,17 @@ public class LU {
 				Slot slot = new Slot(row[0], place);
 				ret.add(slot);
 				
-				/*if(index - 1 >= 0)
+				if(index - 1 >= 0)
 				{
 					if(isWordPlace(tokens[index - 1]))
 					{
-						
+						Slot guessed_slot = new Slot(getProperKeywordPlaceIdentifierForKeyword(row[0]), tokens[index-1]);
+						if(!isSlotAlreadyExistOnFrame(ret, guessed_slot))
+						{
+							ret.add(guessed_slot);
+						}
 					}
-				}*/
+				}
 			}
 			else if(keyword_category.equals(TIME_MODIFIER))
 			{
@@ -82,7 +87,40 @@ public class LU {
 		
 		return ret;
 	}
+	
+	private boolean isSlotAlreadyExistOnFrame(Frame ret, Slot guessed_slot) {
+		
+		boolean found = false;
+		
+		for(Slot row: ret.getContent())
+		{
+			if(row.getValue().equals(guessed_slot.getValue()))
+			{
+				found = true;
+				break;
+			}
+		}
+		
+		return found;
+	}
 
+	private String getProperKeywordPlaceIdentifierForKeyword(String keyword)
+	{
+		String ret = "";
+		
+		for(String row: place_identifiers_relations)
+		{
+			String[] arr = row.split("\\s");
+			if(arr[0].equals(keyword))
+			{
+				ret = arr[1];
+				break;
+			}
+		}
+		
+		return ret;
+	}
+	
 	private String getPlace(String[] tokens, int start_index) {
 		
 		/*
@@ -180,6 +218,7 @@ public class LU {
 		ada_identifiers = loadTextFile("ada_identifiers");
 		list_jadwal_identifiers = loadTextFile("list_jadwal_identifiers");
 		place_identifiers = loadTextFile("place_identifiers");
+		place_identifiers_relations = loadTextFile("place_identifiers_relations");
 	}
 	
 	private ArrayList<String> loadTextFile(String filename)
