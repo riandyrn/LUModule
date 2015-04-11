@@ -42,9 +42,11 @@ public class LU {
 	private Frame constructFrameFromAnalysisResult(AnalysisResult analysis) {
 		
 		ArrayList<String[]> mapping = analysis.getMapping();
+		ArrayList<Integer> consecutive_mapping = analysis.getConsecutiveMapping();
 		String[] tokens = analysis.getTokens();
 		Frame ret = new Frame();
 		
+		// construct from mapping
 		for(String[] row: mapping)
 		{
 			String keyword_category = getCategoryOfKeyword(row[0]);
@@ -82,6 +84,18 @@ public class LU {
 			{
 				Slot slot = new Slot(ADA_IDENTIFIER, row[0]);
 				ret.add(slot);
+			}
+		}
+		
+		//construct from consecutive occurence
+		if(consecutive_mapping.size() > 0)
+		{
+			for(Integer start_index: consecutive_mapping)
+			{
+				Slot slot_dari = new Slot("dari", tokens[start_index]);
+				Slot slot_ke = new Slot("ke", tokens[start_index + 1]);
+				ret.add(slot_dari);
+				ret.add(slot_ke);
 			}
 		}
 		
@@ -185,10 +199,12 @@ public class LU {
 		
 		String[] tokens = sentence.split("\\s");
 		
-		ArrayList<String[]> mapping = new ArrayList<>();
+		ArrayList<String[]> mapping = new ArrayList<>(); //contains mapping for keyword and its index in token
+		ArrayList<Integer> consecutive_mapping = new ArrayList<>(); //contains starting index of consecutive occurence
 		
 		for(int i = 0; i < tokens.length; i++)
 		{
+			// mapping keywords
 			if(keywords.contains(tokens[i]))
 			{
 				String[] map = new String[2];
@@ -196,9 +212,18 @@ public class LU {
 				map[1] = String.valueOf(i);
 				mapping.add(map);
 			}
+			
+			//mapping consecutive places occuring
+			if(i + 1 < tokens.length)
+			{
+				if(isWordPlace(tokens[i]) && isWordPlace(tokens[i+1]))
+				{
+					consecutive_mapping.add(i);
+				}
+			}
 		}
 		
-		AnalysisResult ret = new AnalysisResult(tokens, mapping);
+		AnalysisResult ret = new AnalysisResult(tokens, mapping, consecutive_mapping);
 		return ret;
 	}
 	

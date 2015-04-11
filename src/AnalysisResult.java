@@ -5,12 +5,14 @@ public class AnalysisResult {
 	
 	private ArrayList<String[]> mapping;
 	private String[] tokens;
+	private ArrayList<Integer> consecutive_mapping;
 	
 	public AnalysisResult(String[] tokens,
-			ArrayList<String[]> mapping) {
+			ArrayList<String[]> mapping, ArrayList<Integer> consecutive_mapping) {
 		
 		this.tokens = tokens;
 		this.mapping = mapping;
+		this.consecutive_mapping = consecutive_mapping;
 	}
 
 	public ArrayList<String[]> getMapping() 
@@ -21,6 +23,11 @@ public class AnalysisResult {
 	public String[] getTokens() 
 	{
 		return tokens;
+	}
+	
+	public ArrayList<Integer> getConsecutiveMapping()
+	{
+		return consecutive_mapping;
 	}
 
 }
