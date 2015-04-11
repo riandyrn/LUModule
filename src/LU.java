@@ -1,9 +1,10 @@
+
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
-
 
 public class LU {
 
@@ -18,7 +19,9 @@ public class LU {
 	private ArrayList<String> ada_identifiers;
 	private ArrayList<String> list_jadwal_identifiers;
 	private ArrayList<String> place_identifiers;
+	
 	private ArrayList<String> place_identifiers_relations;
+	private ArrayList<String> identifier_aliases;
 	
 	private final String TIME_MODIFIER = "time_modifier";
 	private final String PLACE_IDENTIFIER = "place_identifier";
@@ -55,7 +58,7 @@ public class LU {
 			{
 				int index = Integer.valueOf(row[1]);
 				String place = getPlace(tokens, index);
-				Slot slot = new Slot(row[0], place);
+				Slot slot = new Slot(resolveKeywordAlias(row[0]), place);
 				ret.add(slot);
 				
 				if(index - 1 >= 0)
@@ -102,6 +105,23 @@ public class LU {
 		return ret;
 	}
 	
+	private String resolveKeywordAlias(String keyword) 
+	{
+		String ret = keyword;
+		
+		for(String row: identifier_aliases)
+		{
+			String[] tokens = row.split("\\s");
+			if(tokens[0].equals(keyword))
+			{
+				ret = tokens[1];
+				break;
+			}
+		}
+		
+		return ret;
+	}
+
 	private boolean isSlotAlreadyExistOnFrame(Frame ret, Slot guessed_slot) {
 		
 		boolean found = false;
@@ -244,6 +264,7 @@ public class LU {
 		list_jadwal_identifiers = loadTextFile("list_jadwal_identifiers");
 		place_identifiers = loadTextFile("place_identifiers");
 		place_identifiers_relations = loadTextFile("place_identifiers_relations");
+		identifier_aliases = loadTextFile("identifier_aliases");
 	}
 	
 	private ArrayList<String> loadTextFile(String filename)
